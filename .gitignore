@@ -1,0 +1,24 @@
+# Arquivos de compilação bare-metal e imagens intermediárias
+*.o
+*.bin
+*.img
+*.vdi
+*.ppm
+*.log
+*.tmp
+re_enter_gui.ppm
+repro.ppm
+parse_pixels.py
+*preview*.png
+clean_*.png
+shot_*.png
+kaz_term*.png
+screenshot_*.png
+res_*.png
+repro.png
+
+# Mantém a pasta assets/ e a pasta iso/
+!assets/
+!assets/*
+!iso/
+!iso/*.iso
