@@ -5,145 +5,149 @@
 <h1 align="center">KazOS Sovereign Prototype v2.0</h1>
 
 <p align="center">
-  <b>Protótipo Bare-Metal x86 com Compositor Gráfico Kaz-X e Suíte de Aplicativos Escritos 100% em Kaz</b><br />
-  <i>Transparência Técnica Radical: Sem firula, sem maquiagem e com engenharia de verdade.</i>
+  <b>Bare-Metal x86 Prototype with Kaz-X Window Manager & Native Application Suite Written 100% in Kaz</b><br />
+  <i>Radical Technical Transparency: No buzzwords, no makeup, just raw engineering facts.</i>
 </p>
 
 <p align="center">
-  <a href="#-download-da-imagem-live-iso"><img src="https://img.shields.io/badge/Download-Live%20ISO%20(1%20MB)-00B87C?style=for-the-badge&logo=disk" alt="Download ISO" /></a>
-  <img src="https://img.shields.io/badge/Status-Protótipo%20Operacional-blue?style=for-the-badge" alt="Status" />
-  <img src="https://img.shields.io/badge/Video-1024x768%20TrueColor%2060FPS-orange?style=for-the-badge" alt="Video" />
-  <img src="https://img.shields.io/badge/Linguagem-Kaz%20+%20HAL%20C%2FASM-purple?style=for-the-badge" alt="Linguagem" />
+  <a href="README.pt-BR.md">🇧🇷 Versão em Português disponível aqui</a>
+</p>
+
+<p align="center">
+  <a href="#-download-the-live-iso"><img src="https://img.shields.io/badge/Download-Live%20ISO%20(1%20MB)-00B87C?style=for-the-badge&logo=disk" alt="Download ISO" /></a>
+  <img src="https://img.shields.io/badge/Status-Functional%20Prototype-blue?style=for-the-badge" alt="Status" />
+  <img src="https://img.shields.io/badge/Display-1024x768%20TrueColor%2060FPS-orange?style=for-the-badge" alt="Video" />
+  <img src="https://img.shields.io/badge/Language-Kaz%20+%20C%2FASM%20HAL-purple?style=for-the-badge" alt="Language" />
 </p>
 
 ---
 
-## 🎯 O que é o KazOS?
+## 🎯 What is KazOS?
 
-O **KazOS** é um **protótipo de sistema operacional bare-metal x86** construído com um objetivo muito claro e honesto: **demonstrar na prática a maturidade, capacidade de baixo nível e poder de computação da linguagem de programação Kaz**.
+**KazOS** is a **bare-metal x86 operating system prototype** built with a single, honest purpose: **to empirically demonstrate the maturity, low-level execution power, and expressiveness of the Kaz programming language**.
 
-Não se trata de uma distribuição Linux modificada, não há Electron, nem Node.js, nem Python, nem X11/Wayland de terceiros por trás. Ao dar boot, a máquina física ou virtual executa diretamente o código compilado da linguagem controlando o hardware, gerenciando memória, teclado PS/2, mouse, relógio RTC CMOS e renderizando um ambiente gráfico completo double-buffered a 60 FPS com resolução 1024x768 TrueColor.
-
----
-
-## 🔍 Auditoria de Soberania Técnica (Fato x Realidade)
-
-Para evitar qualquer tipo de propaganda enganosa ou mistificação técnica comum na internet, apresentamos a divisão cirúrgica e exata do que compõe o KazOS hoje:
-
-### 🟢 O que é 100% Kaz Puro (`kaz_ui/*.kaz` — 1.758 linhas de Kaz):
-* **Compositor Gráfico & Window Manager (Kaz-X):** Toda a arquitetura de janelas, foco, Z-ordering (camadas de profundidade), arrastar e soltar (drag & drop), minimizar, maximizar, restaurar e hit-testing do mouse.
-* **Ambiente Desktop Completo:** Barra de tarefas inferior, dock lateral de lançadores rápidos, menu iniciar com lista de aplicações, relógio RTC na barra e múltiplos temas visuais dinâmicos.
-* **Shell Interativo (ksh v2.0):** Parser de comandos, execução em tempo real, controle de histórico e manipulação do RamFS.
-* **Suíte de Aplicativos Nativos:**
-  * **KazCalc:** Calculadora gráfica com suporte a teclado e botões visuais.
-  * **KazNotes:** Editor de texto com gravação e leitura direta no RamFS.
-  * **KazMon:** Monitor de recursos do sistema e kernel.
-  * **Terminal Gráfico:** Console integrado com emulação de texto.
-* **VFS em Memória (RamFS):** Estruturas de inode, criação, leitura, edição e exclusão de arquivos em RAM.
-
-### 🟡 O que ainda NÃO é Kaz (Hardware Abstraction Layer / HAL):
-* **Bootloader (`boot.asm` — 146 linhas Assembly x86):** Código de setor de boot MBR de 512 bytes responsável por acordar a CPU em Modo Real 16-bit, configurar o modo de vídeo VESA VBE linear (`0x4118` — 1024x768x24/32bpp) e chavear a CPU para Modo Protegido 32-bit.
-* **Trampolim de Entrada (`kernel_entry.asm` — 20 linhas Assembly x86):** Alinhamento da pilha e chamada da função de entrada.
-* **HAL de Baixo Nível (`kernel.c` — ~1.600 linhas C):** Atua estritamente como ponte de hardware:
-  * Tabela de Descritores de Interrupção (IDT);
-  * Controlador de Interrupções PIC 8259 e timers PIT;
-  * Driver de portas I/O do Mouse PS/2 (`0x60`/`0x64`) e Teclado;
-  * Cópia direta de backbuffer em RAM para a VRAM física (`0xFD000000`).
+This is not a modified Linux distribution. There is no Electron, no Node.js, no Python runtime, and no third-party display server (X11/Wayland). Upon boot, the physical or virtual machine executes directly compiled code from the Kaz toolchain: managing memory, handling PS/2 mouse and keyboard packets, reading real-time CMOS clocks, and rendering a fully double-buffered desktop environment at a rock-solid 60 FPS in 1024x768 TrueColor.
 
 ---
 
-## 🗺️ O Plano de Reescrita: Rumo a 100% Kaz
+## 🔍 Technical Sovereignty Audit (Facts vs. Reality)
 
-O objetivo futuro deste projeto é reduzir a camada em C ao mínimo teórico indispensável. O que impede reescrever o restante em Kaz hoje e como isso será resolvido:
+To maintain absolute integrity and avoid deceptive marketing, here is the exact breakdown of the codebase as it exists today:
 
-1. **Intrínsecos de Portas I/O na Linguagem Kaz:**
-   * Assim que o compilador do Kaz implementar as instruções primitivas `sys_inb` e `sys_outb`, **os drivers de mouse PS/2, teclado e disco ATA serão 100% reescritos em Kaz puro**.
-2. **Manipulação de Memória Física Direta:**
-   * Com ponteiros físicos de baixo nível (`sys_peek32` / `sys_poke32`), a rotina de `swap_buffers` que joga a cena para a VRAM será transferida para Kaz.
-3. **O que permanecerá em Assembly:**
-   * Apenas os 512 bytes do setor de boot MBR (`boot.asm`), pois a arquitetura do processador x86 inicia historicamente em 16-bit real mode antes de qualquer compilador de 32/64 bits poder rodar.
+### 🟢 100% Pure Kaz Code (`kaz_ui/*.kaz` — 1,758 lines of Kaz):
+* **Compositor & Window Manager (Kaz-X):** Window creation, mouse focus, dynamic Z-ordering (depth layers), drag & drop mechanics, minimize, maximize, restore, and pixel-precise hit-testing.
+* **Complete Desktop Shell:** Bottom taskbar with active application tabs, side dock launcher, Start Menu with app triggers, real-time RTC clock, and dynamic multi-palette color themes.
+* **Interactive Terminal Shell (ksh v2.0):** Command interpreter, command line editing, history navigation (Up/Down arrows), and RamFS interaction.
+* **Native Application Suite:**
+  * **KazCalc:** Graphical scientific/integer calculator responding to both mouse buttons and keyboard input.
+  * **KazNotes:** Text editor with live editing, in-memory saving, and instant reading from the RamFS.
+  * **KazMon:** System and memory resource monitor showing Ring 0 services and VRAM status.
+  * **Integrated Terminal:** Embedded graphical terminal window running the command shell.
+* **In-Memory Virtual Filesystem (RamFS):** Inode tables, file creation, reading, appending, and deletion in RAM.
+
+### 🟡 Hardware Abstraction Layer / HAL (Not yet in Kaz):
+* **Bootloader (`boot.asm` — 146 lines x86 Assembly):** Real Mode 16-bit MBR code (512 bytes) that switches video modes via VESA VBE linear framebuffer (`0x4118` — 1024x768x24/32bpp LFB), loads the kernel sectors from disk, and switches CPU to 32-bit Protected Mode.
+* **Kernel Entry Trampoline (`kernel_entry.asm` — 20 lines x86 Assembly):** Stack alignment and jump to entry point.
+* **Low-Level HAL (`kernel.c` — ~1,600 lines C):** Strictly serves as a direct hardware bridge:
+  * Interrupt Descriptor Table (IDT);
+  * PIC 8259 controller setup and PIT timer;
+  * PS/2 mouse and keyboard I/O port drivers (`0x60`/`0x64`);
+  * Fast RAM backbuffer transfer (`swap_buffers`) directly to physical video memory (`0xFD000000`).
 
 ---
 
-## 📸 Galeria do Protótipo em Execução
+## 🗺️ The Roadmap: Rewriting Towards 100% Kaz
+
+Our roadmap aims to reduce C dependencies to the absolute bare minimum required by x86 architecture constraints:
+
+1. **CPU Port I/O Intrinsics in Kaz:**
+   * Once the Kaz compiler implements `sys_inb` and `sys_outb` intrinsics, **the PS/2 mouse, keyboard, and ATA hard disk drivers will be rewritten 100% in pure Kaz**.
+2. **Direct Physical Memory Addressing:**
+   * With low-level pointer intrinsics (`sys_peek32` / `sys_poke32`), the `swap_buffers` blit routine will be migrated into Kaz.
+3. **What will remain in Assembly:**
+   * Only the 512-byte MBR boot sector (`boot.asm`), as x86 hardware inherently powers on in 16-bit Real Mode before any 32/64-bit compiler runtime can execute.
+
+---
+
+## 📸 Prototype Screenshots
 
 <div align="center">
 
-### 1. Tela de Carregamento (Splash com Barra de Progresso)
-*Exibida na transição do console para a interface gráfica, informando a montagem dos subsistemas.*
+### 1. Animated Splash & Loading Screen
+*Shown during initialization when transitioning from console to graphics mode.*
 <br /><br />
 <img src="assets/01_splash_loading.png" alt="Splash Loading Screen" width="85%" />
 
 <br /><br />
 
-### 2. Console Terminal Fullscreen (ksh v2.0)
-*Prompt bare-metal com comandos utilitários, RamFS e histórico de navegação.*
+### 2. Fullscreen Console Terminal (ksh v2.0)
+*Interactive bare-metal prompt featuring built-in RamFS commands and hardware diagnostics.*
 <br /><br />
 <img src="assets/02_console_terminal.png" alt="Console Terminal" width="85%" />
 
 <br /><br />
 
-### 3. Ambiente Gráfico Kaz-X com Multi-Janelas e Aplicativos Nativos
-*Compositor a 60 FPS rodando simultaneamente o Terminal Gráfico, Calculadora, Notas e Painel.*
+### 3. Kaz-X Multi-Window Desktop & Native Suite
+*60 FPS compositor concurrently managing the terminal, calculator, notes editor, and control panel.*
 <br /><br />
-<img src="assets/03_desktop_apps.png" alt="Kaz-X Desktop com Janelas" width="85%" />
+<img src="assets/03_desktop_apps.png" alt="Kaz-X Desktop with Windows" width="85%" />
 
 <br /><br />
 
-### 4. Desktop Limpo (Wallpaper Geométrico e Dock Soberano)
-*Design minimalista com alta definição tipográfica e monitor de status do sistema.*
+### 4. Clean Desktop (Minimalist Wallpaper & Dock)
+*Modern typography, system tray, side launchers, and zero visual clutter.*
 <br /><br />
-<img src="assets/04_desktop_clean.png" alt="Desktop Limpo" width="85%" />
+<img src="assets/04_desktop_clean.png" alt="Clean Desktop" width="85%" />
 
 </div>
 
 ---
 
-## 💾 Download da Imagem Live ISO
+## 💾 Download the Live ISO
 
-A imagem híbrida oficial do KazOS está disponível diretamente neste repositório:
+The bootable hybrid ISO image is provided directly inside this repository:
 
-* 💿 **Arquivo:** [`iso/kazos_live.iso`](iso/kazos_live.iso) *(Tamanho: ~1.0 MB)*
-* **Formato:** ISO 9660 Híbrida compatível com BIOS legada, ISOLINUX/MEMDISK e gravação direta em pendrive (USB DD).
+* 💿 **File:** [`iso/kazos_live.iso`](iso/kazos_live.iso) *(Size: ~1.0 MB)*
+* **Format:** Hybrid ISO 9660 compatible with Legacy BIOS, ISOLINUX/MEMDISK, and raw USB flash drive writing (DD mode).
 
 ---
 
-## 🚀 Como Testar
+## 🚀 How to Run & Test
 
-### No QEMU (Linux ou Windows):
+### In QEMU (Linux or Windows):
 ```bash
-# Rodar direto como imagem de disco
+# Boot as a raw disk image
 qemu-system-x86_64 -drive format=raw,file=iso/kazos_live.iso
 
-# Ou emular como drive de CD-ROM / ISO
+# Or emulate as an optical CD-ROM / ISO drive
 qemu-system-x86_64 -cdrom iso/kazos_live.iso -boot d
 ```
 
-### No VirtualBox:
-1. Crie uma Máquina Virtual: Tipo: **Other**, Versão: **Other/Unknown (32-bit ou 64-bit)**, Memória: **128 MB**.
-2. Em **Armazenamento (Storage)**, no drive de CD/DVD, aponte para o arquivo `kazos_live.iso`.
-3. Inicie a máquina. O bootloader ISOLINUX carregará o KazOS instantaneamente.
+### In VirtualBox:
+1. Create a Virtual Machine: Type: **Other**, Version: **Other/Unknown (32-bit or 64-bit)**, RAM: **128 MB**.
+2. Under **Storage**, attach `kazos_live.iso` to the virtual CD/DVD drive.
+3. Start the virtual machine. The ISOLINUX loader will launch KazOS instantly.
 
-### No PC Real (Pendrive Bootável):
-* **Linux:** Grave a imagem no pendrive com o utilitário `dd`:
+### On Physical Hardware (Bootable USB):
+* **Linux:** Flash the ISO using `dd`:
   ```bash
   sudo dd if=iso/kazos_live.iso of=/dev/sdX bs=4M status=progress && sync
   ```
-* **Windows:** Use o **Rufus**. Selecione a ISO e grave preferencialmente em **Modo Imagem DD**.
+* **Windows:** Use **Rufus**. Select the ISO and write in **DD Image Mode**.
 
 ---
 
-## ⌨️ Controles Principais
+## ⌨️ Essential Keyboard & Mouse Controls
 
-| Tecla / Ação | Ação |
+| Key / Action | Result |
 | :--- | :--- |
-| `x` + `Enter` (no console) | Inicia o ambiente gráfico **Kaz-X** com Splash Screen. |
-| `ESC` (na interface gráfica) | Abre a janela modal de confirmação: `[Enter: Sair]` / `[ESC: Cancelar e Ficar]`. |
-| `Botão Esquerdo do Mouse` | Foca janelas, clica em botões, arrasta pela barra de título. |
-| `Setas Cima / Baixo` | Navegação no histórico de comandos do shell. |
+| `x` + `Enter` (in console) | Launches the graphical **Kaz-X** environment with splash screen. |
+| `ESC` (in GUI) | Triggers confirmation modal: `[Enter: Confirm Exit]` / `[ESC: Cancel & Stay]`. |
+| `Left Mouse Button` | Window focus, button clicks, titlebar dragging. |
+| `Up / Down Arrows` | Shell command history recall in terminal. |
 
 ---
 
 <p align="center">
-  <b>Kaz Programming Language</b> • <a href="https://kazlang.xyz">kazlang.xyz</a> • Feito com foco, soberania e transparência.
+  <b>Kaz Programming Language</b> • <a href="https://kazlang.xyz">kazlang.xyz</a> • Engineering-driven, sovereign, and transparent.
 </p>
