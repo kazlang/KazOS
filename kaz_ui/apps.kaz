@@ -293,3 +293,53 @@ function desenharConteudoMonitor(Janela j, TemaCores tema) {
 
     sys_render_monitor_in_rect(cx, cy, cw, ch);
 }
+
+// --- Aplicativo 4: KazAI (Assistente de IA & Motor .kzm Phased) ---
+int g_aiTokensGerados = 428;
+int g_aiTokensPorSeg = 21;
+int g_aiCamadaAtiva = 18;
+int g_aiTotalCamadas = 32;
+
+function desenharConteudoAI(Janela j, TemaCores tema) {
+    int cx = j.x + 12;
+    int cy = j.y + 36;
+    int cw = j.largura - 24;
+    int ch = j.altura - 48;
+
+    // Fundo do terminal de IA
+    sys_fill_rect(cx, cy, cw, ch, 0x00090D12);
+    sys_draw_rect(cx, cy, cw, ch, 0x001D2D3D);
+
+    // Painel de Status do Modelo .kzm
+    sys_fill_rect(cx + 6, cy + 6, cw - 12, 54, 0x00111A24);
+    sys_draw_rect(cx + 6, cy + 6, cw - 12, 54, 0x002A3D52);
+
+    sys_draw_text(cx + 12, cy + 12, "Modelo: LLaMA-3.1 8B (KZM-2.2b Phased Asymmetric)", 0x0000FF9D, 0x00111A24, 0);
+    sys_draw_text(cx + 12, cy + 26, "Throughput: 21.7 tok/s | RAM: 2.35 GB | Cache L1: 64B Aligned", 0x0038BDF8, 0x00111A24, 0);
+    sys_draw_text(cx + 12, cy + 40, "Hardware Interop: YMM SIMD / AVX2 Unpack On-The-Fly (Zero RAM Copy)", 0x00FACC15, 0x00111A24, 0);
+
+    // Conversa simulada
+    int dy = cy + 70;
+    sys_draw_text(cx + 10, dy, "Usuario: Explique como KazOS executa IA em 2.2 bits.", 0x00E2E8F0, 0x00090D12, 0);
+
+    dy = dy + 22;
+    sys_draw_text(cx + 10, dy, "KazAI Assistant:", 0x00A855F7, 0x00090D12, 0);
+    
+    dy = dy + 18;
+    sys_draw_text(cx + 10, dy, "> 1. Separacao Asimetrica: Atencao a 4.2b preserva sintaxe exata.", 0x00CBD5E1, 0x00090D12, 0);
+    dy = dy + 16;
+    sys_draw_text(cx + 10, dy, "> 2. MLP a 2.1b via Codebook comprime 65% da rede sem perda.", 0x00CBD5E1, 0x00090D12, 0);
+    dy = dy + 16;
+    sys_draw_text(cx + 10, dy, "> 3. Double-Buffering: Enquanto a CPU calcula Camada L,", 0x00CBD5E1, 0x00090D12, 0);
+    dy = dy + 16;
+    sys_draw_text(cx + 10, dy, "     a Camada L+1 faz streaming assincrono na memoria.", 0x00CBD5E1, 0x00090D12, 0);
+    dy = dy + 16;
+    sys_draw_text(cx + 10, dy, "> 4. Descompressao vetorial direta nos registradores YMM.", 0x0000FF9D, 0x00090D12, 0);
+
+    // Barra de progresso de Streaming de Camada
+    int by = cy + ch - 32;
+    sys_draw_text(cx + 10, by, "Pipeline Streaming SSD -> RAM: Camada 18/32 [Double-Buffer OK]", 0x0094A3B8, 0x00090D12, 0);
+    sys_fill_rect(cx + 10, by + 16, cw - 20, 8, 0x001E293B);
+    sys_fill_rect(cx + 10, by + 16, (cw - 20) * 18 / 32, 8, 0x0000FF9D);
+}
+

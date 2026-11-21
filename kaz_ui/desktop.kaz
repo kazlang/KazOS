@@ -49,12 +49,21 @@ Janela g_winMon = Janela {
     ativa: false, visivel: false, minimizada: false
 };
 
-// Z-order das 5 janelas (z4 = topo / focada, z0 = fundo)
-int g_z0 = 4;
-int g_z1 = 5;
-int g_z2 = 1;
-int g_z3 = 3;
-int g_z4 = 2;
+// ID 6: KazAI (Assistente de IA & Motor .kzm Phased)
+Janela g_winAI = Janela {
+    id: 6, x: 160, y: 100, largura: 560, altura: 380,
+    titulo: "KazAI Assistant (Motor .kzm Phased 2.2b)",
+    corFundo: 0x00090D12, corTitulo: 0x009333EA,
+    ativa: false, visivel: false, minimizada: false
+};
+
+// Z-order das 6 janelas (z5 = topo / focada, z0 = fundo)
+int g_z0 = 6;
+int g_z1 = 4;
+int g_z2 = 5;
+int g_z3 = 1;
+int g_z4 = 3;
+int g_z5 = 2;
 
 int g_janelaFocada = 2;
 int g_arrastandoId = 0;
@@ -94,11 +103,18 @@ function kaz_x_init(int screenW, int screenH) {
     g_winMon.ativa = false;
     g_winMon.visivel = false;
 
-    g_z0 = 4;
-    g_z1 = 5;
-    g_z2 = 1;
-    g_z3 = 3;
-    g_z4 = 2;
+    g_winAI = criarJanela(6, 160, 100, 560, 380, "KazAI Assistant (Motor .kzm Phased 2.2b)");
+    g_winAI.corFundo = 0x00090D12;
+    g_winAI.corTitulo = 0x009333EA;
+    g_winAI.ativa = false;
+    g_winAI.visivel = false;
+
+    g_z0 = 6;
+    g_z1 = 4;
+    g_z2 = 5;
+    g_z3 = 1;
+    g_z4 = 3;
+    g_z5 = 2;
     g_janelaFocada = 2;
     g_arrastandoId = 0;
     g_menuIniciarAberto = false;
@@ -111,26 +127,35 @@ function atualizarFlagsAtiva(int idAtivo) {
     g_winCalc.ativa   = (idAtivo == 3);
     g_winNotes.ativa  = (idAtivo == 4);
     g_winMon.ativa    = (idAtivo == 5);
+    g_winAI.ativa     = (idAtivo == 6);
 }
 
 function promoverZOrder(int id) {
-    if (g_z4 == id) { return; }
+    if (g_z5 == id) { return; }
+    if (g_z4 == id) {
+        g_z4 = g_z5;
+        g_z5 = id;
+        return;
+    }
     if (g_z3 == id) {
         g_z3 = g_z4;
-        g_z4 = id;
+        g_z4 = g_z5;
+        g_z5 = id;
         return;
     }
     if (g_z2 == id) {
         g_z2 = g_z3;
         g_z3 = g_z4;
-        g_z4 = id;
+        g_z4 = g_z5;
+        g_z5 = id;
         return;
     }
     if (g_z1 == id) {
         g_z1 = g_z2;
         g_z2 = g_z3;
         g_z3 = g_z4;
-        g_z4 = id;
+        g_z4 = g_z5;
+        g_z5 = id;
         return;
     }
     if (g_z0 == id) {
@@ -138,7 +163,8 @@ function promoverZOrder(int id) {
         g_z1 = g_z2;
         g_z2 = g_z3;
         g_z3 = g_z4;
-        g_z4 = id;
+        g_z4 = g_z5;
+        g_z5 = id;
         return;
     }
 }
@@ -160,6 +186,9 @@ function focarJanela(int id) {
     } else if (id == 5) {
         g_winMon.visivel = true;
         g_winMon.minimizada = false;
+    } else if (id == 6) {
+        g_winAI.visivel = true;
+        g_winAI.minimizada = false;
     }
     promoverZOrder(id);
     atualizarFlagsAtiva(id);
@@ -167,18 +196,20 @@ function focarJanela(int id) {
 
 function obterJanelaVisivelTopo(): int {
     int passo = 0;
-    while (passo < 5) {
-        int id = g_z4;
-        if (passo == 1) { id = g_z3; }
-        else if (passo == 2) { id = g_z2; }
-        else if (passo == 3) { id = g_z1; }
-        else if (passo == 4) { id = g_z0; }
+    while (passo < 6) {
+        int id = g_z5;
+        if (passo == 1) { id = g_z4; }
+        else if (passo == 2) { id = g_z3; }
+        else if (passo == 3) { id = g_z2; }
+        else if (passo == 4) { id = g_z1; }
+        else if (passo == 5) { id = g_z0; }
 
         if (id == 1 && g_winPainel.visivel && !g_winPainel.minimizada) { return 1; }
         if (id == 2 && g_winTerm.visivel && !g_winTerm.minimizada) { return 2; }
         if (id == 3 && g_winCalc.visivel && !g_winCalc.minimizada) { return 3; }
         if (id == 4 && g_winNotes.visivel && !g_winNotes.minimizada) { return 4; }
         if (id == 5 && g_winMon.visivel && !g_winMon.minimizada) { return 5; }
+        if (id == 6 && g_winAI.visivel && !g_winAI.minimizada) { return 6; }
         passo = passo + 1;
     }
     return 0;
@@ -260,8 +291,8 @@ function desenharJanelaPainel(TemaCores tema) {
     sys_draw_text(cx + 10, cy + 102, "* Compiler: kazos_cc.kaz", tema.tituloAtivo, tema.textoClaro, 0);
     sys_draw_text(cx + 10, cy + 124, "* FS: RamFS Dinamico RW", 0x00008F5D, tema.textoClaro, 0);
     sys_draw_text(cx + 10, cy + 146, "* Boot: MBR 240 Setores", tema.texto, tema.textoClaro, 0);
-    sys_draw_text(cx + 10, cy + 168, "* Apps: Term/Calc/Notes/Mon", tema.tituloAtivo, tema.textoClaro, 0);
-    sys_draw_num(cx + 10, cy + 192, g_cliquesTeste, 0x00D97706, tema.textoClaro);
+    sys_draw_text(cx + 10, cy + 168, "* AI Engine: KZM Phased 2.2b", 0x00008F5D, tema.textoClaro, 0);
+    sys_draw_text(cx + 10, cy + 190, "* SIMD: FPU/SSE/AVX Ring0", tema.tituloAtivo, tema.textoClaro, 0);
 
     // Card 2: Lançador Rápido & Temas
     int card2X = cx + 252;
@@ -350,6 +381,11 @@ function desenharJanelaPorId(int id, TemaCores tema) {
         if (g_winMon.visivel && !g_winMon.minimizada) {
             desenharMolduraJanela(g_winMon, tema);
             desenharConteudoMonitor(g_winMon, tema);
+        }
+    } else if (id == 6) {
+        if (g_winAI.visivel && !g_winAI.minimizada) {
+            desenharMolduraJanela(g_winAI, tema);
+            desenharConteudoAI(g_winAI, tema);
         }
     }
 }
@@ -465,17 +501,19 @@ function kaz_x_render(int screenW, int screenH) {
 
     // 2. Ícones de Desktop à Esquerda (Coluna Organizada)
     desenharIconeDesktop(18, 38, ">_", "TermiKAZ", 0x000F1D26, tema.acento, tema.terminalVerde, tema);
-    desenharIconeDesktop(18, 122, "+=", "KazCalc",  0x002A1C11, 0x00D97706, tema.terminalAmarelo, tema);
-    desenharIconeDesktop(18, 206, "==", "KazNotes", 0x00191B38, 0x006366F1, tema.textoClaro, tema);
-    desenharIconeDesktop(18, 290, "##", "KazMon",   0x000F2537, 0x0038BDF8, tema.terminalCiano, tema);
-    desenharIconeDesktop(18, 374, "[]", "Painel",   0x001F3A52, tema.textoClaro, tema.textoClaro, tema);
+    desenharIconeDesktop(18, 122, "AI", "KazAI",   0x001B0F2B, 0x009333EA, 0x00C084FC, tema);
+    desenharIconeDesktop(18, 206, "+=", "KazCalc",  0x002A1C11, 0x00D97706, tema.terminalAmarelo, tema);
+    desenharIconeDesktop(18, 290, "==", "KazNotes", 0x00191B38, 0x006366F1, tema.textoClaro, tema);
+    desenharIconeDesktop(18, 374, "##", "KazMon",   0x000F2537, 0x0038BDF8, tema.terminalCiano, tema);
+    desenharIconeDesktop(18, 458, "[]", "Painel",   0x001F3A52, tema.textoClaro, tema.textoClaro, tema);
 
-    // 3. Desenha as 5 Janelas na Ordem Z exata (do fundo g_z0 até o topo g_z4)
+    // 3. Desenha as 6 Janelas na Ordem Z exata (do fundo g_z0 até o topo g_z5)
     desenharJanelaPorId(g_z0, tema);
     desenharJanelaPorId(g_z1, tema);
     desenharJanelaPorId(g_z2, tema);
     desenharJanelaPorId(g_z3, tema);
     desenharJanelaPorId(g_z4, tema);
+    desenharJanelaPorId(g_z5, tema);
 
     // 4. Barra de Tarefas Inferior (Dock / Taskbar)
     int barY = screenH - 38;
@@ -487,22 +525,24 @@ function kaz_x_render(int screenW, int screenH) {
     if (g_menuIniciarAberto) {
         corBtnStart = 0x0000E599;
     }
-    sys_fill_rect(8, barY + 5, 92, 28, corBtnStart);
-    sys_draw_rect(8, barY + 5, 92, 28, tema.textoClaro);
-    sys_draw_text(18, barY + 11, ":: KazOS", tema.textoClaro, corBtnStart, 0);
+    sys_fill_rect(8, barY + 5, 84, 28, corBtnStart);
+    sys_draw_rect(8, barY + 5, 84, 28, tema.textoClaro);
+    sys_draw_text(16, barY + 11, ":: KazOS", tema.textoClaro, corBtnStart, 0);
 
-    // Abas das 5 Aplicações na Taskbar
+    // Abas das 6 Aplicações na Taskbar
     bool pAberta = (g_winPainel.visivel && !g_winPainel.minimizada);
     bool tAberta = (g_winTerm.visivel && !g_winTerm.minimizada);
     bool cAberta = (g_winCalc.visivel && !g_winCalc.minimizada);
     bool nAberta = (g_winNotes.visivel && !g_winNotes.minimizada);
     bool mAberta = (g_winMon.visivel && !g_winMon.minimizada);
+    bool aAberta = (g_winAI.visivel && !g_winAI.minimizada);
 
-    desenharAbaTaskbar(108, barY + 5, 136, ">_ TermiKAZ", (g_janelaFocada == 2 && tAberta), g_winTerm.visivel, 0x00008F5D, tema);
-    desenharAbaTaskbar(250, barY + 5, 126, "+= KazCalc",  (g_janelaFocada == 3 && cAberta), g_winCalc.visivel, 0x00D97706, tema);
-    desenharAbaTaskbar(382, barY + 5, 128, "== KazNotes", (g_janelaFocada == 4 && nAberta), g_winNotes.visivel, 0x004F46E5, tema);
-    desenharAbaTaskbar(516, barY + 5, 122, "## Monitor",  (g_janelaFocada == 5 && mAberta), g_winMon.visivel,   0x000284C7, tema);
-    desenharAbaTaskbar(644, barY + 5, 124, "[] Painel",   (g_janelaFocada == 1 && pAberta), g_winPainel.visivel, 0x001F3A52, tema);
+    desenharAbaTaskbar(98,  barY + 5, 114, ">_ Term",   (g_janelaFocada == 2 && tAberta), g_winTerm.visivel, 0x00008F5D, tema);
+    desenharAbaTaskbar(216, barY + 5, 114, "AI KazAI",   (g_janelaFocada == 6 && aAberta), g_winAI.visivel,   0x009333EA, tema);
+    desenharAbaTaskbar(334, barY + 5, 114, "+= Calc",   (g_janelaFocada == 3 && cAberta), g_winCalc.visivel, 0x00D97706, tema);
+    desenharAbaTaskbar(452, barY + 5, 114, "== Notes",  (g_janelaFocada == 4 && nAberta), g_winNotes.visivel, 0x004F46E5, tema);
+    desenharAbaTaskbar(570, barY + 5, 114, "## Mon",    (g_janelaFocada == 5 && mAberta), g_winMon.visivel,   0x000284C7, tema);
+    desenharAbaTaskbar(688, barY + 5, 108, "[] Painel",  (g_janelaFocada == 1 && pAberta), g_winPainel.visivel, 0x001F3A52, tema);
 
     // Indicador de Console e Relógio RTC na direita da Taskbar
     sys_draw_text(screenW - 242, barY + 11, "[ESC: Console]", tema.terminalCiano, tema.barraTarefas, 0);
@@ -636,6 +676,15 @@ function alternarOuFocarTaskbar(int id) {
         } else {
             focarJanela(5);
         }
+    } else if (id == 6) {
+        if (g_janelaFocada == 6 && g_winAI.visivel && !g_winAI.minimizada) {
+            g_winAI.minimizada = true;
+            g_winAI.ativa = false;
+            int prox = obterJanelaVisivelTopo();
+            if (prox > 0) { focarJanela(prox); }
+        } else {
+            focarJanela(6);
+        }
     }
 }
 
@@ -673,27 +722,31 @@ function kaz_x_on_mouse_down(int mx, int my, int screenW, int screenH): int {
 
     // 1. Verifica clique na Barra de Tarefas
     if (my >= barY) {
-        if (contemPonto(criarRetangulo(8, barY + 5, 92, 28), mx, my)) {
+        if (contemPonto(criarRetangulo(8, barY + 5, 84, 28), mx, my)) {
             g_menuIniciarAberto = !g_menuIniciarAberto;
             return 1;
         }
-        if (contemPonto(criarRetangulo(108, barY + 5, 136, 28), mx, my)) {
+        if (contemPonto(criarRetangulo(98, barY + 5, 114, 28), mx, my)) {
             alternarOuFocarTaskbar(2);
             return 1;
         }
-        if (contemPonto(criarRetangulo(250, barY + 5, 126, 28), mx, my)) {
+        if (contemPonto(criarRetangulo(216, barY + 5, 114, 28), mx, my)) {
+            alternarOuFocarTaskbar(6);
+            return 1;
+        }
+        if (contemPonto(criarRetangulo(334, barY + 5, 114, 28), mx, my)) {
             alternarOuFocarTaskbar(3);
             return 1;
         }
-        if (contemPonto(criarRetangulo(382, barY + 5, 128, 28), mx, my)) {
+        if (contemPonto(criarRetangulo(452, barY + 5, 114, 28), mx, my)) {
             alternarOuFocarTaskbar(4);
             return 1;
         }
-        if (contemPonto(criarRetangulo(516, barY + 5, 122, 28), mx, my)) {
+        if (contemPonto(criarRetangulo(570, barY + 5, 114, 28), mx, my)) {
             alternarOuFocarTaskbar(5);
             return 1;
         }
-        if (contemPonto(criarRetangulo(644, barY + 5, 124, 28), mx, my)) {
+        if (contemPonto(criarRetangulo(688, barY + 5, 108, 28), mx, my)) {
             alternarOuFocarTaskbar(1);
             return 1;
         }
@@ -755,14 +808,15 @@ function kaz_x_on_mouse_down(int mx, int my, int screenW, int screenH): int {
         g_menuIniciarAberto = false;
     }
 
-    // 3. Verifica clique nas 5 Janelas na ordem inversa de Z (topo g_z4 -> fundo g_z0)
+    // 3. Verifica clique nas 6 Janelas na ordem inversa de Z (topo g_z5 -> fundo g_z0)
     int passo = 0;
-    while (passo < 5) {
-        int testId = g_z4;
-        if (passo == 1) { testId = g_z3; }
-        else if (passo == 2) { testId = g_z2; }
-        else if (passo == 3) { testId = g_z1; }
-        else if (passo == 4) { testId = g_z0; }
+    while (passo < 6) {
+        int testId = g_z5;
+        if (passo == 1) { testId = g_z4; }
+        else if (passo == 2) { testId = g_z3; }
+        else if (passo == 3) { testId = g_z2; }
+        else if (passo == 4) { testId = g_z1; }
+        else if (passo == 5) { testId = g_z0; }
 
         if (testId == 1 && janelaContemPonto(g_winPainel, mx, my)) {
             focarJanela(1);
@@ -888,6 +942,30 @@ function kaz_x_on_mouse_down(int mx, int my, int screenW, int screenH): int {
             return 1;
         }
 
+        if (testId == 6 && janelaContemPonto(g_winAI, mx, my)) {
+            focarJanela(6);
+            if (janelaBotaoFecharClicado(g_winAI, mx, my)) {
+                g_winAI.visivel = false;
+                int prox = obterJanelaVisivelTopo();
+                if (prox > 0) { focarJanela(prox); }
+                return 1;
+            }
+            if (janelaBotaoMinimizarClicado(g_winAI, mx, my)) {
+                g_winAI.minimizada = true;
+                g_winAI.ativa = false;
+                int prox = obterJanelaVisivelTopo();
+                if (prox > 0) { focarJanela(prox); }
+                return 1;
+            }
+            if (janelaBarraTituloClicada(g_winAI, mx, my)) {
+                g_arrastandoId = 6;
+                g_dragOffX = mx - g_winAI.x;
+                g_dragOffY = my - g_winAI.y;
+                return 1;
+            }
+            return 1;
+        }
+
         passo = passo + 1;
     }
 
@@ -897,18 +975,22 @@ function kaz_x_on_mouse_down(int mx, int my, int screenW, int screenH): int {
         return 1;
     }
     if (contemPonto(criarRetangulo(18, 122, 72, 74), mx, my)) {
-        focarJanela(3);
+        focarJanela(6);
         return 1;
     }
     if (contemPonto(criarRetangulo(18, 206, 72, 74), mx, my)) {
-        focarJanela(4);
+        focarJanela(3);
         return 1;
     }
     if (contemPonto(criarRetangulo(18, 290, 72, 74), mx, my)) {
-        focarJanela(5);
+        focarJanela(4);
         return 1;
     }
     if (contemPonto(criarRetangulo(18, 374, 72, 74), mx, my)) {
+        focarJanela(5);
+        return 1;
+    }
+    if (contemPonto(criarRetangulo(18, 458, 72, 74), mx, my)) {
         focarJanela(1);
         return 1;
     }
@@ -963,6 +1045,13 @@ function kaz_x_on_mouse_move(int mx, int my, int screenW, int screenH): int {
         if (ny + g_winMon.altura > screenH - 38) { ny = screenH - 38 - g_winMon.altura; }
         g_winMon.x = nx;
         g_winMon.y = ny;
+        return 1;
+    }
+    if (g_arrastandoId == 6) {
+        if (nx + g_winAI.largura > screenW) { nx = screenW - g_winAI.largura; }
+        if (ny + g_winAI.altura > screenH - 38) { ny = screenH - 38 - g_winAI.altura; }
+        g_winAI.x = nx;
+        g_winAI.y = ny;
         return 1;
     }
 

@@ -1435,8 +1435,8 @@ void execute_shell_line(char* cmd) {
             term_clear();
             term_print("Fonte alterada para 2x Grande (16x32).\n", COLOR_TERM_YELLOW);
         }
-    } else if (action >= 3 && action <= 5) {
-        /* Abre diretamente o app solicitado (3=KazCalc, 4=KazNotes, 5=KazMon) no Kaz-X */
+    } else if (action >= 3 && action <= 6) {
+        /* Abre diretamente o app solicitado (3=KazCalc, 4=KazNotes, 5=KazMon, 6=KazAI) no Kaz-X */
         kaz_x_open_app(action);
         launch_gui();
     }
