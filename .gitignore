@@ -22,3 +22,11 @@ repro.png
 !assets/*
 !iso/
 !iso/*.iso
+build_iso.py
+build_iso_standard.sh
+GUI_PLAN.md
+kaz_gui.png
+kaz_ui_gen.h
+kazos_live.iso
+tools/qemu_shots.py
+usb_boot_test.png
