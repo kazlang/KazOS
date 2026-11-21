@@ -1370,23 +1370,50 @@ unsigned char mouse_read() {
     return inb(0x60);
 }
 
+void ps2_flush_buffer() {
+    int timeout = 10000;
+    while (timeout-- && (inb(0x64) & 1)) {
+        inb(0x60);
+    }
+}
+
 void init_ps2_mouse() {
+    /* 1. Limpa qualquer lixo ou scancode pendente do bootloader na porta 0x60 */
+    ps2_flush_buffer();
+
+    /* 2. Habilita a segunda porta PS/2 (Mouse) */
     ps2_wait_write();
     outb(0x64, 0xA8);
 
+    /* 3. Lê o Controller Command Byte atual */
     ps2_wait_write();
     outb(0x64, 0x20);
     ps2_wait_read();
-    unsigned char status = inb(0x60) | 2;
+    unsigned char ccb = inb(0x60);
+
+    /* 4. Garante configuração correta:
+     *    bit 0 = 1 (Keyboard IRQ1)
+     *    bit 1 = 1 (Mouse IRQ12)
+     *    bit 4 = 0 (Keyboard clock habilitado)
+     *    bit 5 = 0 (Mouse clock habilitado)
+     *    bit 6 = 1 (Translation ScanCode Set 2 -> Set 1 OBRIGATÓRIO!)
+     */
+    ccb |= (1 << 0) | (1 << 1) | (1 << 6);
+    ccb &= ~((1 << 4) | (1 << 5));
+
     ps2_wait_write();
     outb(0x64, 0x60);
     ps2_wait_write();
-    outb(0x60, status);
+    outb(0x60, ccb);
 
+    /* 5. Inicializa o mouse PS/2 com defaults e habilita streaming */
     mouse_write(0xF6);
     mouse_read();
     mouse_write(0xF4);
     mouse_read();
+
+    /* 6. Limpa o buffer novamente após ACKs do mouse */
+    ps2_flush_buffer();
 }
 
 /* =========================================================================
